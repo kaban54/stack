@@ -15,10 +15,16 @@ int StackConstructor (struct Stack_t *stk, size_t capacity, const char *name, co
     stk -> capacity = capacity;
     stk -> size = 0;
 
-    stk -> data = (Elem_t*) calloc (capacity, sizeof (Elem_t));
+    stk -> data = (Elem_t*) ((char *) calloc (1, capacity * sizeof (Elem_t) + 2 * sizeof (Canary_t)) + sizeof (Canary_t));
     
     for (size_t index = 0; index < capacity; index++)
         stk -> data[index] = POISON_ELEM;
+
+    *((Canary_t *) (stk -> data) - 1       ) = CANARY;
+    *((Canary_t *) (stk -> data + capacity)) = CANARY;
+
+    stk ->  leftcan = CANARY;
+    stk -> rightcan = CANARY;
 
     AssertOK(stk);
 
@@ -28,14 +34,7 @@ int StackConstructor (struct Stack_t *stk, size_t capacity, const char *name, co
 int StackDtor (struct Stack_t *stk)
 {
     AssertOK(stk);
-    free (stk -> data);
-
-    /* ???
-    stk -> info ->      name = NULL;
-    stk -> info -> func_name = NULL;
-    stk -> info -> file_name = NULL;
-    stk -> info ->      line =    0;
-    */
+    free ((void *) ((Canary_t *) (stk -> data) - 1));
  
     stk -> capacity = POISON_SIZE;
     stk -> size     = POISON_SIZE;
@@ -82,14 +81,18 @@ int StackResize (struct Stack_t *stk, size_t capacity)
 {
     AssertOK(stk);
 
-    stk -> data = (Elem_t *) Recalloc ((void *) (stk -> data), capacity, sizeof (stk -> data [0]), stk -> capacity);
+    stk -> data = (Elem_t *) ( (char *) Recalloc ((void *) ((Canary_t *) (stk -> data) - 1),
+                                                         capacity * sizeof (stk -> data [0]) + 2 * sizeof (CANARY), 1,
+                                                  stk -> capacity * sizeof (stk -> data [0]) + 2 * sizeof (CANARY))
+                              + sizeof (CANARY));
 
     if (capacity > stk -> capacity)
     {
-        for (size_t index = stk -> capacity; index < capacity; index ++)
+        for (size_t index = stk -> capacity; index < capacity; index++)
             stk -> data[index] = POISON_ELEM;
     }
 
+    *((Canary_t *) (stk -> data + capacity)) = CANARY;
     stk -> capacity = capacity; 
 
     AssertOK(stk);
@@ -101,11 +104,18 @@ int StackError (struct Stack_t *stk)
 {
     if (stk == NULL) return ACCESS_ERROR;
 
+    if (stk -> leftcan != CANARY || stk -> rightcan != CANARY)
+        stk -> error |=     STRUCT_ERROR;
+
     if (stk -> data == NULL || stk -> data == POISON_PTR)
-        stk -> error |= ACCESS_ERROR;
+        stk -> error |=     ACCESS_ERROR;
 
     if (stk -> size > stk -> capacity || stk -> size == POISON_SIZE || stk -> capacity == POISON_SIZE)
-        stk -> error |=   SIZE_ERROR;
+        stk -> error |=       SIZE_ERROR;
+
+    if (!(stk -> error & (ACCESS_ERROR | SIZE_ERROR)))
+        if (*((Canary_t *) (stk -> data) - 1) != CANARY || *((Canary_t *) (stk -> data + stk -> capacity)) != CANARY)
+            stk -> error |=   DATA_ERROR;
 
     if (stk -> info.     name == NULL || stk -> info.     name == POISON_PTR ||
         stk -> info.func_name == NULL || stk -> info.func_name == POISON_PTR ||
@@ -134,16 +144,22 @@ void StackDump (struct Stack_t *stk, const char *func_name, const char *file_nam
     
     if (stk -> error & INFO_ERROR)
     {
-        fprintf (log, "unknown stack [%p] <-- INFO_ERROR:", stk);
+        fprintf (log, "unknown stack [%p] <-- INFO ERROR:", stk);
         return;
     }
 
-    fprintf (log, "stack [%p] \"%s\" at %s at %s(%d)\n{\n", stk,
+    fprintf (log, "stack [%p] \"%s\" at %s at %s(%d):\n{\n", stk,
                                                             stk -> info.     name,
                                                             stk -> info.func_name,
                                                             stk -> info.file_name,
                                                             stk -> info.     line);
 
+    
+    if (stk -> error & STRUCT_ERROR)
+    {
+        fprintf (log, "\tSTRUCT ERROR\n}\n\n");
+        return;
+    }
 
     if (stk -> size == POISON_SIZE)             fprintf (log, "\tsize     = POISON"               );
     else                                        fprintf (log, "\tsize     = %d", stk -> size      );
@@ -162,6 +178,12 @@ void StackDump (struct Stack_t *stk, const char *func_name, const char *file_nam
         return;
     }
     else                                        fprintf (log, "\tdata [%p]\n\t{\n", stk -> data);
+
+    if (stk -> error & DATA_ERROR)
+    {
+        fprintf (log, "\t\tDATA ERROR\n\t}\n}\n\n");
+        return;
+    }
 
     for (size_t index = 0; index < stk -> capacity; index++)
     {
