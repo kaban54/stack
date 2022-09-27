@@ -5,13 +5,13 @@ all: stack.exe
 
 
 stack.exe: main.o stack.o
-	$(CC) -o stack.exe main.o stack.o $(CFLAGS)
+	$(CC) -o stack.exe main.o stack.o $(CFLAGS) -DCAN -DHASH
 
 main.o: main.cpp 
-	$(CC) -o main.o main.cpp -c $(CFLAGS)
+	$(CC) -o main.o main.cpp -c $(CFLAGS) -DCAN -DHASH
 
 stack.o: stack.cpp 
-	$(CC) -o stack.o stack.cpp -c $(CFLAGS)
+	$(CC) -o stack.o stack.cpp -c $(CFLAGS) -DCAN -DHASH
 
 clean:
 	rm *.o
