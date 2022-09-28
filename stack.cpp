@@ -22,7 +22,7 @@ int StackConstructor (struct Stack_t *stk, size_t capacity, const char *name, co
 
     stk -> data = (Elem_t*) ((char *) calloc (1, capacity * sizeof (Elem_t) + 2 * sizeof (Canary_t)) + sizeof (Canary_t));
 
-    if (stk -> data == NULL) return DATA_ERROR;
+    if (stk -> data - sizeof (Canary_t) == NULL) return DATA_ERROR;
 
     for (size_t index = 0; index < capacity; index++)
         stk -> data[index] = POISON_ELEM;
