@@ -5,6 +5,13 @@ typedef int Elem_t;
 
 int StackConstructor (struct Stack_t *stk, size_t capacity, const char *name, const char *func_name, const char *file_name, int line)
 {
+    if (stk -> status != NEW)
+    {
+        stk -> error = STATUS_ERROR;
+        Dump (stk, LOG_FILE_NAME);
+        return stk -> error;
+    }
+
     stk -> info.     name =      name;
     stk -> info.func_name = func_name;
     stk -> info.file_name = file_name;
@@ -25,8 +32,6 @@ int StackConstructor (struct Stack_t *stk, size_t capacity, const char *name, co
 
     stk ->  leftcan = CANARY;
     stk -> rightcan = CANARY;
-
-    stk -> status = CONSTRUCTED;
 
     SetHash (stk);
 
@@ -126,7 +131,7 @@ int StackError (struct Stack_t *stk)
 {
     if (stk == NULL) return ACCESS_ERROR;
 
-    if (stk -> status != CONSTRUCTED)
+    if (stk -> status != CONSTRUCTED && stk -> status != NEW)
     {
         stk -> error |=     STATUS_ERROR;
         return stk -> error;

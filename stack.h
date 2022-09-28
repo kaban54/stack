@@ -32,7 +32,7 @@
                           Dump((stk), LOG_FILE_NAME);  \
                           if (_assert_ok_err != 0) return (stk) -> error;} while (0);
 
-#define Dump(stk, LOG_FILE_NAME) StackDump (stk, LOG_FILE_NAME, __PRETTY_FUNCTION__, __FILE__, __LINE__);
+#define Dump(stk, filename) StackDump (stk, filename, __PRETTY_FUNCTION__, __FILE__, __LINE__);
 
 
 //typedef int Elem_t;
