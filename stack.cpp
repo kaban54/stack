@@ -5,7 +5,7 @@ typedef int Elem_t;
 
 int StackConstructor (struct Stack_t *stk, size_t capacity, const char *name, const char *func_name, const char *file_name, int line)
 {
-    if (stk -> status != NEW)
+    if (stk -> status != NEW) //mistake 2 will be here
     {
         stk -> error = STATUS_ERROR;
         Dump (stk, LOG_FILE_NAME);
@@ -131,16 +131,15 @@ int StackError (struct Stack_t *stk)
 {
     if (stk == NULL) return ACCESS_ERROR;
 
-    if (stk -> status == NEW) return 0;
     if (stk -> status != CONSTRUCTED)
     {
-        stk -> error |= STATUS_ERROR;
+        stk -> error |=     STATUS_ERROR;
         return stk -> error;
     }
 
 
     #ifdef HASH
-    if (!CorrectStructHash (stk))
+    if (!CorrectStructHash (stk))  //mistake 1 will be here
         stk -> error |=     STRUCT_ERROR;
     #endif
     
@@ -199,12 +198,6 @@ void StackDump (struct Stack_t *stk, const char *filename, const char *func_name
         return;
     }
 
-    if ((stk -> error & STATUS_ERROR) && (stk -> status != DECONSTRUCTED))
-    {
-        fprintf (log, "STATUS ERROR");
-        return;
-    }
-
     fprintf (log, "stack [%p] \"%s\" at %s at %s(%d):\n{\n", stk,
                                                             stk -> info.     name,
                                                             stk -> info.func_name,
@@ -213,9 +206,15 @@ void StackDump (struct Stack_t *stk, const char *filename, const char *func_name
 
     if (stk -> error & STATUS_ERROR)
     {
-        fprintf (log, "\tSTATUS ERROR (STACK HAS BEEN DECONSTRUCTED)\n}\n\n");
+        if      (stk -> status == NEW)
+            fprintf (log, "\tSTATUS ERROR (STACK HAS NOT BEEN CONSTRUCTED)\n}\n\n");
+        else if (stk -> status == DECONSTRUCTED)
+            fprintf (log, "\tSTATUS ERROR (STACK HAS BEEN DECONSTRUCTED)\n}\n\n");
+        else 
+            fprintf (log, "\tSTATUS ERROR (UNDEFINED STATUS)\n}\n\n");
         return;
     }
+
 
     if (stk -> error & STRUCT_ERROR)
     {
@@ -249,12 +248,12 @@ void StackDump (struct Stack_t *stk, const char *filename, const char *func_name
 
     for (size_t index = 0; index < stk -> capacity; index++)
     {
-        fprintf (log, index < stk -> size ? "\t\t*" : "\t\t ");
+                                                fprintf (log, index < stk -> size ? "\t\t*" : "\t\t ");
         if (stk -> data [index] == POISON_ELEM) fprintf (log, "[%d] = POISON\n", index);
         else                                    fprintf (log, "[%d] = %d\n", index, stk -> data [index]); // ??        
     }
 
-    fprintf (log, "\t}\n}\n\n");
+                                                fprintf (log, "\t}\n}\n\n");
     fclose (log);
 }
 
