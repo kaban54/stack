@@ -6,7 +6,7 @@ int main (void)
     struct Stack_t stk = {};
 
     StackCtor (&stk, 10);
-    
+
     StackPush (&stk, 1);
     StackPush (&stk, 2);
     StackPush (&stk, 3);
@@ -19,5 +19,6 @@ int main (void)
     printf ("%d, %d, %d", a, b, c);
 
     StackDtor (&stk);
+
     return 0;
 }

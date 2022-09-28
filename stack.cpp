@@ -5,13 +5,6 @@ typedef int Elem_t;
 
 int StackConstructor (struct Stack_t *stk, size_t capacity, const char *name, const char *func_name, const char *file_name, int line)
 {
-    if (stk -> status != NEW) //mistake 2 will be here
-    {
-        stk -> error = STATUS_ERROR;
-        Dump (stk, LOG_FILE_NAME);
-        return stk -> error;
-    }
-
     stk -> info.     name =      name;
     stk -> info.func_name = func_name;
     stk -> info.file_name = file_name;
@@ -21,7 +14,9 @@ int StackConstructor (struct Stack_t *stk, size_t capacity, const char *name, co
     stk -> size = 0;
 
     stk -> data = (Elem_t*) ((char *) calloc (1, capacity * sizeof (Elem_t) + 2 * sizeof (Canary_t)) + sizeof (Canary_t));
-    
+
+    if (stk -> data == NULL) return DATA_ERROR;
+
     for (size_t index = 0; index < capacity; index++)
         stk -> data[index] = POISON_ELEM;
 
@@ -136,12 +131,6 @@ int StackError (struct Stack_t *stk)
         stk -> error |=     STATUS_ERROR;
         return stk -> error;
     }
-
-
-    #ifdef HASH
-    if (!CorrectStructHash (stk))  //mistake 1 will be here
-        stk -> error |=     STRUCT_ERROR;
-    #endif
     
     #ifdef CAN
     if (stk -> leftcan != CANARY || stk -> rightcan != CANARY)

@@ -43,6 +43,7 @@ const char *const LOG_FILE_NAME = "stacklog.txt";
 
 const Canary_t CANARY = 0xEEE228ABCDEF1234;
 
+
 const Elem_t       POISON_ELEM = (Elem_t) 7 - 1000;
 const size_t       POISON_SIZE = -73;
 const void *const  POISON_PTR  = (void *) 3;
