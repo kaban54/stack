@@ -1,0 +1,250 @@
+int StackConstructor(Stack_t*, size_t, const char*, const char*, const char*, int) at stack.cpp(38):
+ERROR: 0
+stack [0064FEB0] "&stk" at int main() at main.cpp(8):
+{
+	size     = 0
+	capacity = 10
+	data [00CF15F8]
+	{
+		 [0] = POISON
+		 [1] = POISON
+		 [2] = POISON
+		 [3] = POISON
+		 [4] = POISON
+		 [5] = POISON
+		 [6] = POISON
+		 [7] = POISON
+		 [8] = POISON
+		 [9] = POISON
+	}
+}
+
+int StackPush(Stack_t*, Elem_t) at stack.cpp(63):
+ERROR: 0
+stack [0064FEB0] "&stk" at int main() at main.cpp(8):
+{
+	size     = 0
+	capacity = 10
+	data [00CF15F8]
+	{
+		 [0] = POISON
+		 [1] = POISON
+		 [2] = POISON
+		 [3] = POISON
+		 [4] = POISON
+		 [5] = POISON
+		 [6] = POISON
+		 [7] = POISON
+		 [8] = POISON
+		 [9] = POISON
+	}
+}
+
+int StackPush(Stack_t*, Elem_t) at stack.cpp(78):
+ERROR: 0
+stack [0064FEB0] "&stk" at int main() at main.cpp(8):
+{
+	size     = 1
+	capacity = 10
+	data [00CF15F8]
+	{
+		*[0] = 1
+		 [1] = POISON
+		 [2] = POISON
+		 [3] = POISON
+		 [4] = POISON
+		 [5] = POISON
+		 [6] = POISON
+		 [7] = POISON
+		 [8] = POISON
+		 [9] = POISON
+	}
+}
+
+int StackPush(Stack_t*, Elem_t) at stack.cpp(63):
+ERROR: 0
+stack [0064FEB0] "&stk" at int main() at main.cpp(8):
+{
+	size     = 1
+	capacity = 10
+	data [00CF15F8]
+	{
+		*[0] = 1
+		 [1] = POISON
+		 [2] = POISON
+		 [3] = POISON
+		 [4] = POISON
+		 [5] = POISON
+		 [6] = POISON
+		 [7] = POISON
+		 [8] = POISON
+		 [9] = POISON
+	}
+}
+
+int StackPush(Stack_t*, Elem_t) at stack.cpp(78):
+ERROR: 0
+stack [0064FEB0] "&stk" at int main() at main.cpp(8):
+{
+	size     = 2
+	capacity = 10
+	data [00CF15F8]
+	{
+		*[0] = 1
+		*[1] = 2
+		 [2] = POISON
+		 [3] = POISON
+		 [4] = POISON
+		 [5] = POISON
+		 [6] = POISON
+		 [7] = POISON
+		 [8] = POISON
+		 [9] = POISON
+	}
+}
+
+int StackPush(Stack_t*, Elem_t) at stack.cpp(63):
+ERROR: 0
+stack [0064FEB0] "&stk" at int main() at main.cpp(8):
+{
+	size     = 2
+	capacity = 10
+	data [00CF15F8]
+	{
+		*[0] = 1
+		*[1] = 2
+		 [2] = POISON
+		 [3] = POISON
+		 [4] = POISON
+		 [5] = POISON
+		 [6] = POISON
+		 [7] = POISON
+		 [8] = POISON
+		 [9] = POISON
+	}
+}
+
+int StackPush(Stack_t*, Elem_t) at stack.cpp(78):
+ERROR: 0
+stack [0064FEB0] "&stk" at int main() at main.cpp(8):
+{
+	size     = 3
+	capacity = 10
+	data [00CF15F8]
+	{
+		*[0] = 1
+		*[1] = 2
+		*[2] = 3
+		 [3] = POISON
+		 [4] = POISON
+		 [5] = POISON
+		 [6] = POISON
+		 [7] = POISON
+		 [8] = POISON
+		 [9] = POISON
+	}
+}
+
+int StackPop(Stack_t*, Elem_t*) at stack.cpp(86):
+ERROR: 0
+stack [0064FEB0] "&stk" at int main() at main.cpp(8):
+{
+	size     = 3
+	capacity = 10
+	data [00CF15F8]
+	{
+		*[0] = 1
+		*[1] = 2
+		*[2] = 3
+		 [3] = POISON
+		 [4] = POISON
+		 [5] = POISON
+		 [6] = POISON
+		 [7] = POISON
+		 [8] = POISON
+		 [9] = POISON
+	}
+}
+
+int StackPop(Stack_t*, Elem_t*) at stack.cpp(98):
+ERROR: 0
+stack [0064FEB0] "&stk" at int main() at main.cpp(8):
+{
+	size     = 2
+	capacity = 4
+	data [00CF15F8]
+	{
+		*[0] = 1
+		*[1] = 2
+		 [2] = POISON
+		 [3] = POISON
+	}
+}
+
+int StackPop(Stack_t*, Elem_t*) at stack.cpp(86):
+ERROR: 0
+stack [0064FEB0] "&stk" at int main() at main.cpp(8):
+{
+	size     = 2
+	capacity = 4
+	data [00CF15F8]
+	{
+		*[0] = 1
+		*[1] = 2
+		 [2] = POISON
+		 [3] = POISON
+	}
+}
+
+int StackPop(Stack_t*, Elem_t*) at stack.cpp(98):
+ERROR: 0
+stack [0064FEB0] "&stk" at int main() at main.cpp(8):
+{
+	size     = 1
+	capacity = 2
+	data [00CF15F8]
+	{
+		*[0] = 1
+		 [1] = POISON
+	}
+}
+
+int StackPop(Stack_t*, Elem_t*) at stack.cpp(86):
+ERROR: 0
+stack [0064FEB0] "&stk" at int main() at main.cpp(8):
+{
+	size     = 1
+	capacity = 2
+	data [00CF15F8]
+	{
+		*[0] = 1
+		 [1] = POISON
+	}
+}
+
+int StackPop(Stack_t*, Elem_t*) at stack.cpp(98):
+ERROR: 0
+stack [0064FEB0] "&stk" at int main() at main.cpp(8):
+{
+	size     = 0
+	capacity = 2
+	data [00CF15F8]
+	{
+		 [0] = POISON
+		 [1] = POISON
+	}
+}
+
+int StackDtor(Stack_t*) at stack.cpp(45):
+ERROR: 0
+stack [0064FEB0] "&stk" at int main() at main.cpp(8):
+{
+	size     = 0
+	capacity = 2
+	data [00CF15F8]
+	{
+		 [0] = POISON
+		 [1] = POISON
+	}
+}
+

@@ -28,7 +28,9 @@
 
 #define StackCtor(stk, capacity) StackConstructor (stk, capacity, #stk, __PRETTY_FUNCTION__, __FILE__, __LINE__);
 
-#define AssertOK(stk) if (StackError ((stk))) {Dump((stk), LOG_FILE_NAME); return (stk) -> error;}
+#define AssertOK(stk) do {int _assert_ok_err = StackError ((stk));\
+                          Dump((stk), LOG_FILE_NAME);  \
+                          if (_assert_ok_err != 0) return (stk) -> error;} while (0);
 
 #define Dump(stk, LOG_FILE_NAME) StackDump (stk, LOG_FILE_NAME, __PRETTY_FUNCTION__, __FILE__, __LINE__);
 
