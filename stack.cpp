@@ -192,23 +192,22 @@ void StackDump (struct Stack_t *stk, const char *filename, const char *func_name
         return;
     }
 
+    if (stk -> error & STATUS_ERROR)
+    {
+        if      (stk -> status == NEW)
+            fprintf (log, "\tSTATUS ERROR (STACK HAS NOT BEEN CONSTRUCTED)\n\n");
+        else if (stk -> status == DECONSTRUCTED)
+            fprintf (log, "\tSTATUS ERROR (STACK HAS BEEN DECONSTRUCTED)\n\n");
+        else 
+            fprintf (log, "\tSTATUS ERROR (UNDEFINED STATUS)\n\n");
+        return;
+    }
+
     fprintf (log, "stack [%p] \"%s\" at %s at %s(%d):\n{\n", stk,
                                                             stk -> info.     name,
                                                             stk -> info.func_name,
                                                             stk -> info.file_name,
                                                             stk -> info.     line);
-
-    if (stk -> error & STATUS_ERROR)
-    {
-        if      (stk -> status == NEW)
-            fprintf (log, "\tSTATUS ERROR (STACK HAS NOT BEEN CONSTRUCTED)\n}\n\n");
-        else if (stk -> status == DECONSTRUCTED)
-            fprintf (log, "\tSTATUS ERROR (STACK HAS BEEN DECONSTRUCTED)\n}\n\n");
-        else 
-            fprintf (log, "\tSTATUS ERROR (UNDEFINED STATUS)\n}\n\n");
-        return;
-    }
-
 
     if (stk -> error & STRUCT_ERROR)
     {
