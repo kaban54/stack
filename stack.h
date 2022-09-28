@@ -28,9 +28,9 @@
 
 #define StackCtor(stk, capacity) StackConstructor (stk, capacity, #stk, __PRETTY_FUNCTION__, __FILE__, __LINE__);
 
-#define AssertOK(stk) if (StackError (stk)) {Dump(stk); return stk -> error;}
+#define AssertOK(stk) if (StackError ((stk))) {Dump((stk), LOG_FILE_NAME); return (stk) -> error;}
 
-#define Dump(stk) StackDump (stk, __PRETTY_FUNCTION__, __FILE__, __LINE__);
+#define Dump(stk, LOG_FILE_NAME) StackDump (stk, LOG_FILE_NAME, __PRETTY_FUNCTION__, __FILE__, __LINE__);
 
 
 //typedef int Elem_t;
@@ -86,7 +86,7 @@ int StackResize (struct Stack_t *stk, size_t capacity, int param);
 
 int StackError (struct Stack_t *stk);
 
-void StackDump (struct Stack_t *stk, const char *func_name, const char *file_name, int line);
+void StackDump (struct Stack_t *stk, const char *filename, const char *func_name, const char *file_name, int line);
 
 void* Recalloc(void *memptr, size_t num, size_t size, size_t old_num);
 

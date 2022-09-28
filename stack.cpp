@@ -8,7 +8,7 @@ int StackConstructor (struct Stack_t *stk, size_t capacity, const char *name, co
     if (stk -> status != NEW)
     {
         stk -> error = STATUS_ERROR;
-        Dump (stk);
+        Dump (stk, LOG_FILE_NAME);
         return stk -> error;
     }
 
@@ -175,9 +175,9 @@ int StackError (struct Stack_t *stk)
     return stk -> error;
 }
 
-void StackDump (struct Stack_t *stk, const char *func_name, const char *file_name, int line)
+void StackDump (struct Stack_t *stk, const char *filename, const char *func_name, const char *file_name, int line)
 {
-    FILE *log = fopen (LOG_FILE_NAME, "a");
+    FILE *log = fopen (filename, "a");
     if (log == NULL) return;
 
     if (func_name == NULL) func_name = "NULL";
@@ -282,8 +282,8 @@ void SetHash (struct Stack_t *stk)
 {
     stk -> struct_hash = 0;
     
-    stk ->   data_hash = GetHash ((char *) stk -> data, (stk -> capacity) * sizeof (stk -> data [0]) + 2 * sizeof (Canary_t));
-    stk -> struct_hash = GetHash ((char *) stk        , sizeof (*stk));
+    stk ->   data_hash = GetHash ((char *) stk -> data - sizeof (Canary_t), (stk -> capacity) * sizeof (stk -> data [0]) + 2 * sizeof (Canary_t));
+    stk -> struct_hash = GetHash ((char *) stk                            , sizeof (*stk));
 }
 
 int CorrectStructHash (struct Stack_t *stk)
@@ -301,6 +301,6 @@ int CorrectStructHash (struct Stack_t *stk)
 
 int CorrectDataHash (struct Stack_t *stk)
 {
-    if (stk -> data_hash != GetHash ((char *) stk -> data, (stk -> capacity) * sizeof (stk -> data [0]) + 2 * sizeof (Canary_t))) return 0;
+    if (stk -> data_hash != GetHash ((char *) (stk -> data) - sizeof (Canary_t), (stk -> capacity) * sizeof (stk -> data [0]) + 2 * sizeof (Canary_t))) return 0;
     return 1;
 }
