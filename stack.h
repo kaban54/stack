@@ -26,7 +26,7 @@
 #endif
 
 
-#define StackCtor(stk, capacity) StackConstructor (stk, capacity, #stk, __PRETTY_FUNCTION__, __FILE__, __LINE__);
+#define StackCtor(stk, capacity) StackConstructor (stk, capacity, #stk, __PRETTY_FUNCTION__, __FILE__, __LINE__)
 
 #define AssertOK(stk) do {int _assert_ok_err = StackError ((stk));\
                           Dump((stk), LOG_FILE_NAME);  \
@@ -59,10 +59,14 @@ struct StackInfo_t
 
 struct Stack_t
 {
+    #ifdef CANARY_PROT
     Canary_t leftcan;
+    #endif
 
+    #ifdef HASH_PROT
     int struct_hash;
     int   data_hash;
+    #endif
 
     int status;
 
@@ -74,7 +78,9 @@ struct Stack_t
     
     int error;
 
+    #ifdef CANARY_PROT
     Canary_t rightcan;
+    #endif
 };
 
 int StackConstructor (struct Stack_t *stk, size_t capacity, const char *name, const char *func_name, const char *file_name, int line);

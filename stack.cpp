@@ -20,12 +20,10 @@ int StackConstructor (struct Stack_t *stk, size_t capacity, const char *name, co
     stk -> capacity = capacity;
     stk -> size = 0;
 
+    #ifdef CANARY_PROT
+    
     stk -> data = (Elem_t*) ((char *) calloc (1, capacity * sizeof (Elem_t) + 2 * sizeof (Canary_t)) + sizeof (Canary_t));
-
     if (stk -> data - sizeof (Canary_t) == NULL) return DATA_ERROR;
-
-    for (size_t index = 0; index < capacity; index++)
-        stk -> data[index] = POISON_ELEM;
 
     *((Canary_t *) (stk -> data) - 1       ) = CANARY;
     *((Canary_t *) (stk -> data + capacity)) = CANARY;
@@ -33,7 +31,21 @@ int StackConstructor (struct Stack_t *stk, size_t capacity, const char *name, co
     stk ->  leftcan = CANARY;
     stk -> rightcan = CANARY;
 
+    #else
+
+    stk -> data = (Elem_t*) (calloc (capacity, sizeof (Elem_t)));
+    if (stk -> data == NULL) return DATA_ERROR;
+    
+    #endif
+
+    for (size_t index = 0; index < capacity; index++)
+        stk -> data[index] = POISON_ELEM;
+
+    stk -> status = CONSTRUCTED;
+
+    #ifdef HASH_PROT
     SetHash (stk);
+    #endif
 
     AssertOK(stk);
 
@@ -43,15 +55,22 @@ int StackConstructor (struct Stack_t *stk, size_t capacity, const char *name, co
 int StackDtor (struct Stack_t *stk)
 {
     AssertOK(stk);
+
+    #ifdef CANARY_PROT
     free ((void *) ((Canary_t *) (stk -> data) - 1));
- 
+    #else
+    free ((void*) (stk -> data));
+    #endif
+
     stk -> capacity = POISON_SIZE;
     stk -> size     = POISON_SIZE;
 
     stk -> data = (Elem_t*) POISON_PTR;
 
+    #ifdef HAHS_PROT
     stk -> struct_hash = 0;
     stk ->   data_hash = 0;
+    #endif
 
     stk -> status = DECONSTRUCTED;
 
@@ -73,7 +92,9 @@ int StackPush (struct Stack_t *stk, Elem_t value)
 
     if (!err) (stk -> data)[(stk -> size)++] = value;
 
+    #ifdef HASH_PROT
     SetHash (stk);
+    #endif
 
     AssertOK(stk);
 
@@ -93,7 +114,9 @@ int StackPop (struct Stack_t *stk, Elem_t *value)
 
     if (stk -> size * 4 <= (stk -> capacity) && stk -> size > 0) StackResize (stk, stk -> size * 2, NOT_SET_HASH);
 
+    #ifdef HASH_PROT
     SetHash (stk);
+    #endif
 
     AssertOK(stk);
 
@@ -104,10 +127,22 @@ int StackResize (struct Stack_t *stk, size_t capacity, int param = SET_HASH)
 {
     if (param == SET_HASH) AssertOK(stk);
 
-    stk -> data = (Elem_t *) ( (char *) Recalloc ((void *) ((Canary_t *) (stk -> data) - 1),
-                                                         capacity * sizeof (stk -> data [0]) + 2 * sizeof (CANARY), 1,
-                                                  stk -> capacity * sizeof (stk -> data [0]) + 2 * sizeof (CANARY))
+    #ifdef CANARY_PROT
+
+    stk -> data = (Elem_t *) ((char *) Recalloc (
+                                                 (void *) ((Canary_t *) (stk -> data) - 1),
+                                                        capacity * sizeof (stk -> data [0]) + 2 * sizeof (CANARY), 1,
+                                                 stk -> capacity * sizeof (stk -> data [0]) + 2 * sizeof (CANARY)
+                                                )
                               + sizeof (CANARY));
+
+    *((Canary_t *) (stk -> data + capacity)) = CANARY;
+
+    #else
+
+    stk -> data = (Elem_t *) (Recalloc ((void *) (stk -> data), capacity, sizeof (stk -> data [0]), stk -> capacity);
+
+    #endif
 
     if (capacity > stk -> capacity)
     {
@@ -115,12 +150,14 @@ int StackResize (struct Stack_t *stk, size_t capacity, int param = SET_HASH)
             stk -> data[index] = POISON_ELEM;
     }
 
-    *((Canary_t *) (stk -> data + capacity)) = CANARY;
     stk -> capacity = capacity; 
 
     if (param == SET_HASH)
     {
+        #ifdef HASH_PROT
         SetHash (stk);
+        #endif
+
         AssertOK(stk);
     }
 
@@ -139,6 +176,11 @@ int StackError (struct Stack_t *stk)
     
     #ifdef CAN
     if (stk -> leftcan != CANARY || stk -> rightcan != CANARY)
+        stk -> error |=     STRUCT_ERROR;
+    #endif
+
+    #ifdef HASH // <------
+    if (!CorrectStructHash (stk))
         stk -> error |=     STRUCT_ERROR;
     #endif
 
@@ -250,7 +292,7 @@ void StackDump (struct Stack_t *stk, const char *filename, const char *func_name
     fclose (log);
 }
 
-void *Recalloc (void *memptr, size_t num, size_t size, size_t old_num) //?
+void *Recalloc (void *memptr, size_t num, size_t size, size_t old_num)
 {
     memptr = realloc (memptr, num * size);
     if (memptr == NULL) return NULL;
@@ -272,14 +314,20 @@ int GetHash (char *ptr, size_t len)
 
 void SetHash (struct Stack_t *stk)
 {
+    #ifdef HASH_PROT
     stk -> struct_hash = 0;
     
     stk ->   data_hash = GetHash ((char *) stk -> data - sizeof (Canary_t), (stk -> capacity) * sizeof (stk -> data [0]) + 2 * sizeof (Canary_t));
     stk -> struct_hash = GetHash ((char *) stk                            , sizeof (*stk));
+    #endif
 }
 
 int CorrectStructHash (struct Stack_t *stk)
 {
+    #ifndef HASH_PROT 
+    return 1;
+    #endif
+
     int hashbuf = stk -> struct_hash;
     
     stk -> struct_hash = 0;
@@ -293,6 +341,15 @@ int CorrectStructHash (struct Stack_t *stk)
 
 int CorrectDataHash (struct Stack_t *stk)
 {
+    #ifndef HASH_PROT
+    return 1;
+    #endif
+
+    #ifdef CANARY_PROT
     if (stk -> data_hash != GetHash ((char *) (stk -> data) - sizeof (Canary_t), (stk -> capacity) * sizeof (stk -> data [0]) + 2 * sizeof (Canary_t))) return 0;
+    #else
+    if (stk -> data_hash != GetHash ((char *) (stk -> data), (stk -> capacity) * sizeof (stk -> data [0]))) return 0;
+    #endif
+    
     return 1;
 }
